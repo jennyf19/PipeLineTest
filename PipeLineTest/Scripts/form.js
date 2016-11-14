@@ -18,7 +18,7 @@
         define(['jquery'], factory);
     } else {
         // no AMD; invoke directly
-        factory((typeof (jQuery) != 'undefined') ? jQuery : window.Zepto);
+        factory((typeof (jQuery) !== 'undefined') ? jQuery : window.Zepto);
     }
 }
 
@@ -50,7 +50,7 @@
             });
         });
     
-        You can also use ajaxForm with delegation (requires jQuery v1.7+), so the
+        /*You can also use ajaxForm with delegation (requires jQuery v1.7+), so the
         form does not have to exist when you invoke ajaxForm:
     
         $('#myForm').ajaxForm({
@@ -58,9 +58,9 @@
             target: '#output'
         });
     
-        When using ajaxForm, the ajaxSubmit function will be invoked for you
-        at the appropriate time.
-    */
+       // When using ajaxForm, the ajaxSubmit function will be invoked for you
+        //at the appropriate time.
+    
 
     /**
      * Feature detection
@@ -230,9 +230,9 @@
         var mp = 'multipart/form-data';
         var multipart = ($form.attr('enctype') == mp || $form.attr('encoding') == mp);
 
-        var fileAPI = feature.fileapi && feature.formdata;
-        log("fileAPI :" + fileAPI);
-        var shouldUseFrame = (hasFileInputs || multipart) && !fileAPI;
+        var fileApi = feature.fileapi && feature.formdata;
+        log("fileAPI :" + fileApi);
+        var shouldUseFrame = (hasFileInputs || multipart) && !fileApi;
 
         var jqxhr;
 
@@ -250,7 +250,7 @@
                 jqxhr = fileUploadIframe(a);
             }
         }
-        else if ((hasFileInputs || multipart) && fileAPI) {
+        else if ((hasFileInputs || multipart) && fileApi) {
             jqxhr = fileUploadXhr(a);
         }
         else {
@@ -276,8 +276,8 @@
             var i, part;
             for (i = 0; i < len; i++) {
                 // #252; undo param space replacement
-                serialized[i] = serialized[i].replace(/\+/g, ' ');
-                part = serialized[i].split('=');
+                serialized[i] = serialized[i].replace(/\+/g, "");
+                part = serialized[i].split("=");
                 // #278; use array instead of object storage, favoring array serializations
                 result.push([decodeURIComponent(part[0]), decodeURIComponent(part[1])]);
             }
@@ -307,7 +307,7 @@
                 contentType: false,
                 processData: false,
                 cache: false,
-                type: method || 'POST'
+                type: method || "POST"
             });
 
             if (options.uploadProgress) {
@@ -315,7 +315,7 @@
                 s.xhr = function () {
                     var xhr = $.ajaxSettings.xhr();
                     if (xhr.upload) {
-                        xhr.upload.addEventListener('progress', function (event) {
+                        xhr.upload.addEventListener("progress", function (event) {
                             var percent = 0;
                             var position = event.loaded || event.position; /*event.position is deprecated*/
                             var total = event.total;
@@ -905,7 +905,7 @@
         }
         var form = this;
         form.clk = target;
-        if (target.type == 'image') {
+        if (target.type === 'image') {
             if (e.offsetX !== undefined) {
                 form.clk_x = e.offsetX;
                 form.clk_y = e.offsetY;
@@ -974,9 +974,9 @@
                 continue;
             }
 
-            if (semantic && form.clk && el.type == "image") {
+            if (semantic && form.clk && el.type === "image") {
                 // handle image inputs on the fly when semantic == true
-                if (form.clk == el) {
+                if (form.clk === el) {
                     a.push({ name: n, value: $(el).val(), type: el.type });
                     a.push({ name: n + '.x', value: form.clk_x }, { name: n + '.y', value: form.clk_y });
                 }
@@ -984,7 +984,7 @@
             }
 
             v = $.fieldValue(el, true);
-            if (v && v.constructor == Array) {
+            if (v && v.constructor === Array) {
                 if (elements) {
                     elements.push(el);
                 }
@@ -992,7 +992,7 @@
                     a.push({ name: n, value: v[j] });
                 }
             }
-            else if (feature.fileapi && el.type == 'file') {
+            else if (feature.fileapi && el.type === 'file') {
                 if (elements) {
                     elements.push(el);
                 }
@@ -1019,7 +1019,7 @@
             // input type=='image' are not found in elements array! handle it here
             var $input = $(form.clk), input = $input[0];
             n = input.name;
-            if (n && !input.disabled && input.type == 'image') {
+            if (n && !input.disabled && input.type === 'image') {
                 a.push({ name: n, value: $input.val() });
                 a.push({ name: n + '.x', value: form.clk_x }, { name: n + '.y', value: form.clk_y });
             }
@@ -1048,7 +1048,7 @@
                 return;
             }
             var v = $.fieldValue(this, successful);
-            if (v && v.constructor == Array) {
+            if (v && v.constructor === Array) {
                 for (var i = 0, max = v.length; i < max; i++) {
                     a.push({ name: n, value: v[i] });
                 }
@@ -1100,13 +1100,14 @@
      *    array will be empty, otherwise it will contain one or more values.
      */
     $.fn.fieldValue = function (successful) {
-        for (var val = [], i = 0, max = this.length; i < max; i++) {
+        var val;
+        for (val = [], i = 0, max = this.length; i < max; i++) {
             var el = this[i];
             var v = $.fieldValue(el, successful);
-            if (v === null || typeof v == 'undefined' || (v.constructor == Array && !v.length)) {
+            if (v === null || typeof v == 'undefined' || (v.constructor === Array && !v.length)) {
                 continue;
             }
-            if (v.constructor == Array) {
+            if (v.constructor === Array) {
                 $.merge(val, v);
             }
             else {
@@ -1125,20 +1126,20 @@
             successful = true;
         }
 
-        if (successful && (!n || el.disabled || t == 'reset' || t == 'button' ||
-            (t == 'checkbox' || t == 'radio') && !el.checked ||
-            (t == 'submit' || t == 'image') && el.form && el.form.clk != el ||
-            tag == 'select' && el.selectedIndex == -1)) {
+        if (successful && (!n || el.disabled || t === 'reset' || t === 'button' ||
+            (t === 'checkbox' || t === 'radio') && !el.checked ||
+            (t === 'submit' || t === 'image') && el.form && el.form.clk !== el ||
+            tag === 'select' && el.selectedIndex === -1)) {
             return null;
         }
 
-        if (tag == 'select') {
+        if (tag === 'select') {
             var index = el.selectedIndex;
             if (index < 0) {
                 return null;
             }
             var a = [], ops = el.options;
-            var one = (t == 'select-one');
+            var one = (t === 'select-one');
             var max = (one ? index + 1 : ops.length);
             for (var i = (one ? index : 0) ; i < max; i++) {
                 var op = ops[i];
@@ -1179,16 +1180,16 @@
         var re = /^(?:color|date|datetime|email|month|number|password|range|search|tel|text|time|url|week)$/i; // 'hidden' is not in this list
         return this.each(function () {
             var t = this.type, tag = this.tagName.toLowerCase();
-            if (re.test(t) || tag == 'textarea') {
+            if (re.test(t) || tag === 'textarea') {
                 this.value = '';
             }
-            else if (t == 'checkbox' || t == 'radio') {
+            else if (t == 'checkbox' || t === 'radio') {
                 this.checked = false;
             }
-            else if (tag == 'select') {
+            else if (tag === 'select') {
                 this.selectedIndex = -1;
             }
-            else if (t == "file") {
+            else if (t === "file") {
                 if (/MSIE/.test(navigator.userAgent)) {
                     $(this).replaceWith($(this).clone(true));
                 } else {
@@ -1243,12 +1244,12 @@
         }
         return this.each(function () {
             var t = this.type;
-            if (t == 'checkbox' || t == 'radio') {
+            if (t === 'checkbox' || t === 'radio') {
                 this.checked = select;
             }
-            else if (this.tagName.toLowerCase() == 'option') {
+            else if (this.tagName.toLowerCase() === 'option') {
                 var $sel = $(this).parent('select');
-                if (select && $sel[0] && $sel[0].type == 'select-one') {
+                if (select && $sel[0] && $sel[0].type === 'select-one') {
                     // deselect all other options
                     $sel.find('option').selected(false);
                 }
@@ -1265,7 +1266,7 @@
         if (!$.fn.ajaxSubmit.debug) {
             return;
         }
-        var msg = '[jquery.form] ' + Array.prototype.join.call(arguments, '');
+        var msg = "[jquery.form] " + Array.prototype.join.call(arguments, "");
         if (window.console && window.console.log) {
             window.console.log(msg);
         }
